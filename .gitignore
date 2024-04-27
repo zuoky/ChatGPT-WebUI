@@ -46,4 +46,3 @@ dev
 *.key.pub
 
 yarn.lock
-package-lock.json
