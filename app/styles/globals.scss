@@ -361,3 +361,17 @@ pre {
 .copyable {
   user-select: text;
 }
+
+// ant-card
+.ant-card {
+  .ant-card-meta {
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .ant-card-meta-detail {
+    display: flex;
+    align-items: center;
+    flex: none !important;
+  }
+}

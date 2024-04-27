@@ -14,8 +14,8 @@ import Locale from "../locales";
 import { useAppConfig, useChatStore } from "../store";
 import { MaskAvatar } from "./mask";
 import { useCommand } from "../command";
-import { showConfirm } from "./ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
+import { Modal, Card, Col, Row } from "antd";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -110,6 +110,38 @@ export function NewChat() {
     }
   }, [groups]);
 
+  const filterMasks = groups
+    .flat()
+    .filter(
+      (obj, index, self) =>
+        index === self.findIndex((t) => t.id === obj.id && t.name === obj.name),
+    );
+
+  const assistantRenderer = () => {
+    return (
+      <Row gutter={24}>
+        {filterMasks.map((mask) => (
+          <Col key={mask.id} className="gutter-row" span={12}>
+            <Card
+              size="small"
+              hoverable
+              style={{ marginBottom: 12 }}
+              onClick={() => {
+                startChat(mask);
+              }}
+            >
+              <Card.Meta
+                avatar={<EmojiAvatar avatar={mask.avatar} size={48} />}
+                title={mask.name}
+                // description={gpt.name}
+              />
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
   return (
     <div className={styles["new-chat"]}>
       <div className={styles["mask-header"]}>
@@ -118,7 +150,7 @@ export function NewChat() {
           text={Locale.NewChat.Return}
           onClick={() => navigate(Path.Home)}
         ></IconButton>
-        {!state?.fromHome && (
+        {/* {!state?.fromHome && (
           <IconButton
             text={Locale.NewChat.NotShow}
             onClick={async () => {
@@ -130,7 +162,25 @@ export function NewChat() {
               }
             }}
           ></IconButton>
-        )}
+        )} */}
+
+        <div className={styles["actions"]}>
+          <IconButton
+            text={Locale.NewChat.More}
+            onClick={() => navigate(Path.Masks)}
+            icon={<EyeIcon />}
+            bordered
+            shadow
+          />
+          <IconButton
+            text={Locale.NewChat.Skip}
+            onClick={() => startChat()}
+            icon={<LightningIcon />}
+            type="primary"
+            shadow
+            className={styles["skip"]}
+          />
+        </div>
       </div>
       <div className={styles["mask-cards"]}>
         <div className={styles["mask-card"]}>
@@ -145,40 +195,9 @@ export function NewChat() {
       </div>
 
       <div className={styles["title"]}>{Locale.NewChat.Title}</div>
-      <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div>
+      {/* <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div> */}
 
-      <div className={styles["actions"]}>
-        <IconButton
-          text={Locale.NewChat.More}
-          onClick={() => navigate(Path.Masks)}
-          icon={<EyeIcon />}
-          bordered
-          shadow
-        />
-
-        <IconButton
-          text={Locale.NewChat.Skip}
-          onClick={() => startChat()}
-          icon={<LightningIcon />}
-          type="primary"
-          shadow
-          className={styles["skip"]}
-        />
-      </div>
-
-      <div className={styles["masks"]} ref={maskRef}>
-        {groups.map((masks, i) => (
-          <div key={i} className={styles["mask-row"]}>
-            {masks.map((mask, index) => (
-              <MaskItem
-                key={index}
-                mask={mask}
-                onClick={() => startChat(mask)}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+      <div className={styles["masks"]}>{assistantRenderer()}</div>
     </div>
   );
 }
